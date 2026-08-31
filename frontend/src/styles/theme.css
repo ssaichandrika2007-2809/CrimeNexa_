@@ -1,0 +1,62 @@
+:root {
+  /* Base */
+  --bg: #12141a;
+  --surface: #191c24;
+  --surface-alt: #20242f;
+  --border: #2b2f3b;
+
+  /* Text */
+  --text: #e8e9ee;
+  --text-muted: #8b8fa3;
+  --text-faint: #565b6e;
+
+  /* Accent (single accent per the investigative brief) */
+  --accent: #8a6fdf;
+  --accent-soft: rgba(138, 111, 223, 0.14);
+  --accent-strong: #a488ec;
+
+  /* Semantic — risk/danger reads as case-file red-flag, not decoration */
+  --risk: #e2725b;
+  --risk-soft: rgba(226, 114, 91, 0.14);
+  --success: #55b98b;
+  --success-soft: rgba(85, 185, 139, 0.14);
+
+  /* Entity group colors, used consistently in graph + badges */
+  --node-person: #8a6fdf;
+  --node-location: #55b0b9;
+  --node-organization: #e2b25b;
+  --node-vehicle: #7f9ce2;
+  --node-phone: #c98fd0;
+
+  --font-ui: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-mono: 'IBM Plex Mono', 'SFMono-Regular', Consolas, monospace;
+
+  --radius-sm: 6px;
+  --radius: 10px;
+  --radius-lg: 16px;
+
+  --shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-ui);
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+  background: var(--accent-soft);
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 10px;
+}
