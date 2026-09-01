@@ -1,37 +1,60 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-
-const demoAccounts = {
-  investigator: { username: 'investigator@crimegraph.in', password: 'investigator123' },
-  admin: { username: 'admin@crimegraph.in', password: 'admin123' }
-};
+import { useAuth } from '../App';
 
 export default function Hero() {
   const navigate = useNavigate();
+  const { user, login, logout, demoAccounts } = useAuth();
   const [role, setRole] = useState('investigator');
   const [username, setUsername] = useState('investigator@crimegraph.in');
   const [password, setPassword] = useState('investigator123');
   const [error, setError] = useState('');
 
+  useEffect(() => {
+    if (user) {
+      navigate(user.role === 'admin' ? '/admin' : '/investigator', { replace: true });
+    }
+  }, [navigate, user]);
+
   const handleSubmit = (event) => {
     event.preventDefault();
-    const account = demoAccounts[role];
+    const result = login({ role, username, password });
 
-    if (!account) {
-      setError('Select a valid role.');
-      return;
-    }
-
-    if (username.trim() !== account.username || password !== account.password) {
-      setError('Invalid username or password for the selected role.');
+    if (!result.ok) {
+      setError(result.message);
       return;
     }
 
     setError('');
-    navigate(role === 'admin' ? '/admin' : '/investigator', {
-      state: { user: role === 'admin' ? 'Administrator' : 'Inspector Verma' }
-    });
+    navigate(role === 'admin' ? '/admin' : '/investigator');
   };
+
+  if (user) {
+    return (
+      <div className="hero hero-logged-in">
+        <div className="hero-content hero-content-logged">
+          <span className="hero-eyebrow">Access granted</span>
+          <h1 className="hero-title">
+            Welcome back, <span className="hero-title-accent">{user.name}</span>
+          </h1>
+          <p className="hero-subtitle">
+            You are signed in as the {user.label.toLowerCase()} role. Continue to your command center or switch sessions.
+          </p>
+          <div className="hero-actions">
+            <button className="btn btn-accent" onClick={() => navigate('/dashboard')}>
+              Open dashboard
+            </button>
+            <button className="btn btn-ghost" onClick={() => navigate(user.role === 'admin' ? '/admin' : '/investigator')}>
+              Go to role page
+            </button>
+            <button className="btn btn-ghost" onClick={logout}>
+              Sign out
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="hero">
@@ -60,9 +83,9 @@ export default function Hero() {
                   const nextRole = event.target.value;
                   setRole(nextRole);
                   setUsername(
-                    nextRole === 'admin' ? 'admin@crimegraph.in' : 'investigator@crimegraph.in'
+                    nextRole === 'admin' ? demoAccounts.admin.username : demoAccounts.investigator.username
                   );
-                  setPassword(nextRole === 'admin' ? 'admin123' : 'investigator123');
+                  setPassword(nextRole === 'admin' ? demoAccounts.admin.password : demoAccounts.investigator.password);
                   setError('');
                 }}
               >
@@ -98,7 +121,7 @@ export default function Hero() {
               <button type="submit" className="btn btn-accent">
                 Sign in
               </button>
-              <button type="button" className="btn btn-ghost" onClick={() => navigate('/analyze')}>
+              <button type="button" className="btn btn-ghost" onClick={() => navigate('/dashboard')}>
                 Quick view
               </button>
             </div>

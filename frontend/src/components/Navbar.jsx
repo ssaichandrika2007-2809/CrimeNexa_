@@ -1,5 +1,6 @@
 import React from 'react';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
+import { useAuth } from '../App';
 
 const LINKS = [
   { to: '/dashboard', label: 'Dashboard' },
@@ -10,10 +11,13 @@ const LINKS = [
 ];
 
 export default function Navbar() {
+  const navigate = useNavigate();
+  const { user, logout } = useAuth();
+
   return (
     <header className="navbar">
       <div className="navbar-brand">
-        <span className="navbar-mark">CG</span>
+        <img src="/logo.svg" alt="CrimeGraph logo" className="navbar-mark" />
         <span className="navbar-title">CrimeGraph</span>
       </div>
       <nav className="navbar-links">
@@ -27,6 +31,25 @@ export default function Navbar() {
           </NavLink>
         ))}
       </nav>
+
+      {user ? (
+        <div className="navbar-user">
+          <div className="navbar-user-info">
+            <span className="navbar-user-role">{user.label}</span>
+            <strong>{user.name}</strong>
+          </div>
+          <button className="btn btn-ghost navbar-signout" onClick={() => {
+            logout();
+            navigate('/');
+          }}>
+            Sign out
+          </button>
+        </div>
+      ) : (
+        <button className="btn btn-accent" onClick={() => navigate('/')}>
+          Sign in
+        </button>
+      )}
     </header>
   );
 }
