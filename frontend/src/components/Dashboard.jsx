@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { fetchGraph, fetchPeople, fetchCases, fetchReports } from '../api';
 
 export default function Dashboard() {
@@ -8,6 +8,14 @@ export default function Dashboard() {
   const [reports, setReports] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [locationQuery, setLocationQuery] = useState('Old Town Warehouse, Mumbai');
+  const [geoState, setGeoState] = useState({
+    lat: 19.076,
+    lon: 72.8777,
+    label: 'Mumbai',
+    loading: false,
+    error: ''
+  });
 
   useEffect(() => {
     Promise.all([fetchGraph(), fetchPeople(), fetchCases(), fetchReports()])
@@ -21,6 +29,41 @@ export default function Dashboard() {
       .finally(() => setLoading(false));
   }, []);
 
+  const geocodeLocation = useCallback(async (query) => {
+    if (!query.trim()) {
+      return;
+    }
+
+    setGeoState((current) => ({ ...current, loading: true, error: '' }));
+
+    try {
+      const response = await fetch(
+        `https://nominatim.openstreetmap.org/search?format=jsonv2&q=${encodeURIComponent(query)}`
+      );
+      const results = await response.json();
+      const match = results?.[0];
+
+      if (!match) {
+        setGeoState((current) => ({ ...current, loading: false, error: 'No map match found for that location.' }));
+        return;
+      }
+
+      setGeoState({
+        lat: Number(match.lat),
+        lon: Number(match.lon),
+        label: match.display_name || query,
+        loading: false,
+        error: ''
+      });
+    } catch {
+      setGeoState((current) => ({ ...current, loading: false, error: 'Map lookup failed. Please try a different location.' }));
+    }
+  }, []);
+
+  useEffect(() => {
+    geocodeLocation(locationQuery);
+  }, [geocodeLocation, locationQuery]);
+
   const counts = {
     people: graph.nodes.filter((n) => n.group === 'person').length,
     locations: graph.nodes.filter((n) => n.group === 'location').length,
@@ -31,6 +74,7 @@ export default function Dashboard() {
 
   const topInfluencers = people.slice(0, 5);
   const flaggedReports = reports.filter((r) => r.riskFlags && r.riskFlags.length > 0).slice(0, 5);
+  const mapUrl = `https://www.openstreetmap.org/export/embed.html?bbox=${(geoState.lon - 0.04).toFixed(5)}%2C${(geoState.lat - 0.04).toFixed(5)}%2C${(geoState.lon + 0.04).toFixed(5)}%2C${(geoState.lat + 0.04).toFixed(5)}&layer=mapnik&marker=${geoState.lat}%2C${geoState.lon}`;
 
   if (loading) return <div className="page-loading">Loading command center…</div>;
   if (error) return <div className="page-error">{error}</div>;
@@ -111,6 +155,42 @@ export default function Dashboard() {
             </ul>
           )}
         </section>
+      </div>
+
+      <div className="panel geo-panel">
+        <div className="geo-header">
+          <div>
+            <h2>Location geocoder</h2>
+            <p className="page-subtitle">Map a suspect, warehouse, or incident location to a coordinate.</p>
+          </div>
+          <div className="geo-search">
+            <input
+              className="input geo-input"
+              value={locationQuery}
+              onChange={(event) => setLocationQuery(event.target.value)}
+              placeholder="Search a location"
+            />
+            <button className="btn btn-accent" onClick={() => geocodeLocation(locationQuery)}>
+              {geoState.loading ? 'Locating…' : 'Locate'}
+            </button>
+          </div>
+        </div>
+
+        {geoState.error && <p className="page-error">{geoState.error}</p>}
+
+        <div className="geo-meta">
+          <strong>{geoState.label}</strong>
+          <span>
+            {geoState.lat.toFixed(5)}, {geoState.lon.toFixed(5)}
+          </span>
+        </div>
+
+        <iframe
+          title="CrimeGraph location map"
+          className="geo-map"
+          src={mapUrl}
+          loading="lazy"
+        />
       </div>
     </div>
   );
