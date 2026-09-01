@@ -3,11 +3,12 @@ const { EXTRACTION_SYSTEM_PROMPT, buildUserMessage, parseExtractionJSON } = requ
 
 let client = null;
 function getClient() {
-  if (!process.env.ANTHROPIC_API_KEY) {
+  const apiKey = process.env.ANTHROPIC_API_KEY?.trim();
+  if (!apiKey || /^your_/i.test(apiKey)) {
     throw new Error('ANTHROPIC_API_KEY is not set. Add it to backend/.env');
   }
   if (!client) {
-    client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+    client = new Anthropic({ apiKey });
   }
   return client;
 }

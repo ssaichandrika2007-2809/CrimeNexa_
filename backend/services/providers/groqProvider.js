@@ -3,14 +3,15 @@ const { EXTRACTION_SYSTEM_PROMPT, buildUserMessage, parseExtractionJSON } = requ
 
 let client = null;
 function getClient() {
-  if (!process.env.GROQ_API_KEY) {
+  const apiKey = process.env.GROQ_API_KEY?.trim();
+  if (!apiKey || /^your_/i.test(apiKey)) {
     throw new Error('GROQ_API_KEY is not set. Add it to backend/.env');
   }
   if (!client) {
     // Groq exposes an OpenAI-compatible API, so the official `openai` SDK
     // works as a drop-in client — just point it at Groq's base URL.
     client = new OpenAI({
-      apiKey: process.env.GROQ_API_KEY,
+      apiKey,
       baseURL: 'https://api.groq.com/openai/v1'
     });
   }
