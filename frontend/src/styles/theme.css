@@ -1,41 +1,43 @@
 :root {
   /* Base */
-  --bg: #12141a;
-  --surface: #191c24;
-  --surface-alt: #20242f;
-  --border: #2b2f3b;
+  --bg: #f5f7fa;
+  --surface: #ffffff;
+  --surface-alt: #f8fafc;
+  --border: #e5e7eb;
 
   /* Text */
-  --text: #e8e9ee;
-  --text-muted: #8b8fa3;
-  --text-faint: #565b6e;
+  --text: #1f2937;
+  --text-muted: #6b7280;
+  --text-faint: #9ca3af;
 
-  /* Accent (single accent per the investigative brief) */
-  --accent: #8a6fdf;
-  --accent-soft: rgba(138, 111, 223, 0.14);
-  --accent-strong: #a488ec;
+  /* Professional blue brand */
+  --primary: #2563eb;
+  --primary-soft: rgba(37, 99, 235, 0.08);
+  --primary-strong: #1d4ed8;
 
-  /* Semantic — risk/danger reads as case-file red-flag, not decoration */
-  --risk: #e2725b;
-  --risk-soft: rgba(226, 114, 91, 0.14);
-  --success: #55b98b;
-  --success-soft: rgba(85, 185, 139, 0.14);
+  /* Semantic */
+  --risk: #b91c1c;
+  --risk-soft: rgba(185, 28, 28, 0.08);
+  --success: #0f766e;
+  --success-soft: rgba(15, 118, 110, 0.08);
+  --warning: #d97706;
+  --warning-soft: rgba(217, 119, 6, 0.08);
 
-  /* Entity group colors, used consistently in graph + badges */
-  --node-person: #8a6fdf;
-  --node-location: #55b0b9;
-  --node-organization: #e2b25b;
-  --node-vehicle: #7f9ce2;
-  --node-phone: #c98fd0;
+  /* Entity group colors */
+  --node-person: #2563eb;
+  --node-location: #0f766e;
+  --node-organization: #b45309;
+  --node-vehicle: #7c3aed;
+  --node-phone: #db2777;
 
-  --font-ui: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  --font-mono: 'IBM Plex Mono', 'SFMono-Regular', Consolas, monospace;
+  --font-ui: 'Inter', 'Segoe UI', Roboto, system-ui, sans-serif;
+  --font-mono: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
 
-  --radius-sm: 6px;
-  --radius: 10px;
+  --radius-sm: 8px;
+  --radius: 12px;
   --radius-lg: 16px;
 
-  --shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+  --shadow: 0 1px 2px rgba(15, 23, 42, 0.04), 0 8px 24px rgba(15, 23, 42, 0.06);
 }
 
 body {
@@ -43,20 +45,23 @@ body {
   color: var(--text);
   font-family: var(--font-ui);
   -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
 }
 
 ::selection {
-  background: var(--accent-soft);
+  background: rgba(37, 99, 235, 0.14);
 }
 
 ::-webkit-scrollbar {
   width: 10px;
   height: 10px;
 }
+
 ::-webkit-scrollbar-track {
-  background: var(--bg);
+  background: #eef2f7;
 }
+
 ::-webkit-scrollbar-thumb {
-  background: var(--border);
-  border-radius: 10px;
+  background: #cbd5e1;
+  border-radius: 999px;
 }

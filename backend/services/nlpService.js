@@ -1,9 +1,11 @@
 const anthropicProvider = require('./providers/anthropicProvider');
 const groqProvider = require('./providers/groqProvider');
+const llamaProvider = require('./providers/llamaProvider');
 
 const PROVIDERS = {
   anthropic: anthropicProvider,
-  groq: groqProvider
+  groq: groqProvider,
+  llama: llamaProvider
 };
 
 function uniqueItems(items, picker) {

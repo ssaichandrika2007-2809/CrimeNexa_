@@ -12,7 +12,9 @@ const EMPTY_DB = {
   phones: [],
   relationships: [],
   cases: [],
-  reports: []
+  reports: [],
+  evidence: [],
+  leads: []
 };
 
 const DEMO_DB = {
@@ -61,10 +63,24 @@ const DEMO_DB = {
       text: 'On 14 March, informant reports that Ravi Kumar met Sanjay Mehta at the Old Town warehouse on MG Road. Ravi\'s phone (98765xxxxx) has been in repeated contact with Sanjay over the past two weeks. A white Maruti Swift registered to Sanjay was seen at the same location. Sanjay is believed to be linked to Shakti Traders, a shell company under investigation for suspicious transactions.',
       summary: 'Warehouse logistics network involving shell-company transactions and repeated contact between suspects.',
       riskFlags: ['Cash movement', 'Shell entity linkage', 'Warehouse handoff'],
+      evidence: [
+        { entityType: 'person', entityName: 'Ravi Kumar', confidence: 0.9, provenance: { source: 'fir', extractedFrom: 'textual_report' } },
+        { entityType: 'person', entityName: 'Sanjay Mehta', confidence: 0.9, provenance: { source: 'fir', extractedFrom: 'textual_report' } },
+        { entityType: 'location', entityName: 'Old Town Warehouse', confidence: 0.9, provenance: { source: 'fir', extractedFrom: 'textual_report' } }
+      ],
+      confidence: 0.86,
+      events: [
+        { type: 'met_at', source: 'Ravi Kumar', target: 'Old Town Warehouse', description: 'Ravi met associates at the warehouse', confidence: 0.88 }
+      ],
+      leads: [
+        { title: 'Review Sanjay Mehta', riskScore: 0.9, reasons: ['Shell entity linkage', 'Warehouse handoff'] }
+      ],
       caseId: 'c1',
       createdAt: '2026-09-01T00:00:00.000Z'
     }
-  ]
+  ],
+  evidence: [],
+  leads: []
 };
 
 function ensureDB() {

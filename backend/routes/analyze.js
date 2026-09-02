@@ -2,6 +2,11 @@ const express = require('express');
 const { v4: uuidv4 } = require('uuid');
 const { readDB, writeDB } = require('../db');
 const { extractEntities } = require('../services/nlpService');
+const { buildInvestigationContext } = require('../services/investigationModel');
+const {
+  syncEntitiesToGraph,
+  syncRelationshipsToGraph
+} = require('../services/graphService');
 
 const router = express.Router();
 
@@ -30,6 +35,23 @@ router.post('/', async (req, res, next) => {
     }
 
     const extracted = await extractEntities(text, sourceType);
+
+    if (extracted && extracted.entities && Object.keys(extracted.entities).length > 0) {
+      await syncEntitiesToGraph(extracted.entities, caseId);
+    }
+
+    if (Array.isArray(extracted?.relationships) && extracted.relationships.length > 0) {
+      await syncRelationshipsToGraph(extracted.relationships, caseId);
+    }
+
+    const investigationContext = buildInvestigationContext({
+      text,
+      sourceType,
+      entities: extracted.entities || {},
+      relationships: extracted.relationships || [],
+      riskFlags: extracted.riskFlags || []
+    });
+
     const db = readDB();
     const nameToId = {};
 
@@ -78,8 +100,13 @@ router.post('/', async (req, res, next) => {
       id: uuidv4(),
       sourceType: sourceType || 'unspecified',
       text,
-      summary: extracted.summary || '',
-      riskFlags: extracted.riskFlags || [],
+      summary: extracted.summary || investigationContext.summary || '',
+      riskFlags: extracted.riskFlags || investigationContext.riskFlags || [],
+      evidence: investigationContext.evidence || [],
+      confidence: investigationContext.confidence || 0.75,
+      events: investigationContext.events || [],
+      leads: investigationContext.leads || [],
+      provenance: investigationContext.provenance || { sourceType: sourceType || 'unspecified' },
       caseId: caseId || null,
       createdAt: new Date().toISOString()
     };
@@ -93,9 +120,11 @@ router.post('/', async (req, res, next) => {
     }
 
     db.reports.push(reportRecord);
+    db.evidence = [...(db.evidence || []), ...reportRecord.evidence];
+    db.leads = [...(db.leads || []), ...reportRecord.leads];
     writeDB(db);
 
-    res.json({ report: reportRecord, extracted });
+    res.json({ report: reportRecord, extracted, investigationContext });
   } catch (err) {
     next(err);
   }

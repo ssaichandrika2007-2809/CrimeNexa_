@@ -60,14 +60,14 @@ export default function Hero() {
     <div className="hero">
       <div className="hero-grid" aria-hidden="true" />
       <div className="hero-content">
-        <span className="hero-eyebrow">NCRB · Women Safety Division · SIH 2026</span>
+        <span className="hero-eyebrow">CrimeGraph · Intelligence Platform</span>
         <h1 className="hero-title">
           Crime<span className="hero-title-accent">Graph</span>
         </h1>
         <p className="hero-subtitle">
-          AI-powered criminal network analysis. Feed in FIRs, call records, financial data and
-          surveillance notes — CrimeGraph extracts entities, maps hidden relationships, and
-          surfaces the people who matter most in a case.
+          Investigative intelligence for case review and network analysis. CrimeGraph consolidates FIRs,
+          call records, financial details, and surveillance notes to surface people, locations, and
+          relationships that matter most in an inquiry.
         </p>
 
         <div className="hero-login-panel">
@@ -138,16 +138,16 @@ export default function Hero() {
         </div>
         <div className="hero-stats">
           <div className="hero-stat">
-            <span className="hero-stat-value">NLP</span>
-            <span className="hero-stat-label">Entity extraction via Claude</span>
+            <span className="hero-stat-value">Persons</span>
+            <span className="hero-stat-label">Suspects, witnesses, and linked identities</span>
           </div>
           <div className="hero-stat">
-            <span className="hero-stat-value">Graph</span>
-            <span className="hero-stat-label">Relationship mapping</span>
+            <span className="hero-stat-value">Networks</span>
+            <span className="hero-stat-label">Connections, routes, and criminal associations</span>
           </div>
           <div className="hero-stat">
             <span className="hero-stat-value">Flags</span>
-            <span className="hero-stat-label">Suspicious pattern detection</span>
+            <span className="hero-stat-label">Risk indicators and escalation triggers</span>
           </div>
         </div>
       </div>
