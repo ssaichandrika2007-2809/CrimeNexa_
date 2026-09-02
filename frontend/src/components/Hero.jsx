@@ -60,7 +60,10 @@ export default function Hero() {
     <div className="hero">
       <div className="hero-grid" aria-hidden="true" />
       <div className="hero-content">
-        <span className="hero-eyebrow">CrimeGraph · Intelligence Platform</span>
+        <div className="hero-brand-row">
+          <span className="hero-eyebrow">CrimeGraph · Intelligence Platform</span>
+        </div>
+
         <h1 className="hero-title">
           Crime<span className="hero-title-accent">Graph</span>
         </h1>
@@ -71,6 +74,10 @@ export default function Hero() {
         </p>
 
         <div className="hero-login-panel">
+          <div className="panel-tag-row">
+            <span className="panel-tag">Secure access</span>
+            <span className="panel-tag subtle">Demo mode</span>
+          </div>
           <h2>Secure sign in</h2>
           <form className="hero-login-form" onSubmit={handleSubmit}>
             <div className="hero-form-row">

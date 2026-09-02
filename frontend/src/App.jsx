@@ -9,6 +9,7 @@ import PeopleList from './components/PeopleList';
 import CaseList from './components/CaseList';
 import InvestigatorPage from './components/InvestigatorPage';
 import AdminPage from './components/AdminPage';
+import ProfilePage from './components/ProfilePage';
 import './App.css';
 
 const AUTH_KEY = 'crimegraph-user';
@@ -108,6 +109,16 @@ export default function App() {
             <ProtectedRoute allowedRoles={['admin']}>
               <Layout>
                 <AdminPage />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/profile"
+          element={
+            <ProtectedRoute allowedRoles={['investigator', 'admin']}>
+              <Layout>
+                <ProfilePage />
               </Layout>
             </ProtectedRoute>
           }

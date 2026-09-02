@@ -28,6 +28,18 @@ export default function InvestigatorPage() {
         <span className="role-badge">Field unit</span>
       </div>
 
+      <div className="role-spotlight">
+        <div>
+          <span className="section-label">Operational focus</span>
+          <h2>Case activity is accelerating across active networks.</h2>
+        </div>
+        <div className="quick-actions">
+          <span className="action-pill">Review alerts</span>
+          <span className="action-pill">Open cases</span>
+          <span className="action-pill">Watchlist</span>
+        </div>
+      </div>
+
       <div className="role-grid">
         {stats.map((item) => (
           <div className="role-card" key={item.label}>
@@ -38,7 +50,10 @@ export default function InvestigatorPage() {
       </div>
 
       <div className="role-panel">
-        <h3>Investigation queue</h3>
+        <div className="panel-heading-row">
+          <h3>Investigation queue</h3>
+          <span className="mini-badge">Live</span>
+        </div>
         <ul className="list-plain">
           {queue.map((item) => (
             <li key={item.name}>
