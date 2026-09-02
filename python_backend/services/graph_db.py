@@ -52,7 +52,7 @@ def _entity_records(extracted: Dict[str, Any]) -> List[tuple[str, List[Dict[str,
     ]
 
 
-def upsert_entities(extracted: dict, case_id: str | None) -> dict:
+def upsert_entities(extracted: dict, case_id=None) -> dict:
     """Upsert extracted entities and relationships into Neo4j."""
     if not isinstance(extracted, dict):
         raise ValueError("extracted must be a dict")
@@ -299,3 +299,46 @@ def update_location_coordinates(name: str, lat: float, lng: float) -> None:
         """,
         {"name": name, "lat": lat, "lng": lng},
     )
+
+
+def upsert_relationships(relationships: Iterable[Dict[str, Any]], case_id: Optional[str] = None) -> dict:
+    """Create or update relationship records between graph nodes."""
+    if relationships is None:
+        raise ValueError("relationships must be an iterable of relationship objects")
+
+    count = 0
+    with get_driver().session() as session:
+        for relation in relationships:
+            source_name = (relation.get("source") or relation.get("sourceName") or "").strip()
+            target_name = (relation.get("target") or relation.get("targetName") or "").strip()
+            if not source_name or not target_name:
+                continue
+
+            rel_type = relation.get("type") or "associate"
+            description = relation.get("description") or ""
+
+            session.run(
+                """
+                MATCH (source)
+                WHERE source.name = $source_name
+                MATCH (target)
+                WHERE target.name = $target_name
+                MERGE (source)-[r:CONNECTED_TO]->(target)
+                ON CREATE SET r.type = $rel_type,
+                              r.description = $description,
+                              r.caseId = $case_id
+                ON MATCH SET r.type = $rel_type,
+                             r.description = $description,
+                             r.caseId = $case_id
+                """,
+                {
+                    "source_name": source_name,
+                    "target_name": target_name,
+                    "rel_type": rel_type,
+                    "description": description,
+                    "case_id": case_id,
+                },
+            )
+            count += 1
+
+    return {"relationships": count}

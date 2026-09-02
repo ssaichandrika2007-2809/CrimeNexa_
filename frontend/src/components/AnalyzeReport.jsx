@@ -42,14 +42,16 @@ export default function AnalyzeReport() {
   }
 
   const extracted = result?.extracted;
+  const investigationContext = result?.investigationContext || result?.report || null;
+  const confidence = result?.report?.confidence ?? investigationContext?.confidence ?? null;
 
   return (
     <div className="page">
       <div className="page-header">
         <h1>Analyze Report</h1>
         <p className="page-subtitle">
-          Paste raw report text below. Claude extracts entities and relationships, which are
-          merged straight into the network graph.
+          Paste raw report text below. The LLM extracts entities and relationships, which are
+          merged straight into the network graph and investigation timeline.
         </p>
       </div>
 
@@ -96,7 +98,7 @@ export default function AnalyzeReport() {
           />
 
           <button className="btn btn-accent" type="submit" disabled={loading || !text.trim()}>
-            {loading ? 'Analyzing…' : 'Extract with Claude'}
+            {loading ? 'Analyzing…' : 'Extract with LLM'}
           </button>
 
           {error && <p className="form-error">{error}</p>}
@@ -120,6 +122,78 @@ export default function AnalyzeReport() {
                       {f}
                     </span>
                   ))}
+                </div>
+              )}
+
+              {typeof confidence === 'number' && (
+                <div className="confidence-panel">
+                  <div className="confidence-meta">
+                    <span>Investigation confidence</span>
+                    <strong>{Math.round(confidence * 100)}%</strong>
+                  </div>
+                  <div className="confidence-bar">
+                    <span style={{ width: `${Math.round(confidence * 100)}%` }} />
+                  </div>
+                </div>
+              )}
+
+              {(result?.report?.evidence?.length > 0 || investigationContext?.evidence?.length > 0) && (
+                <div className="result-section">
+                  <h3>Evidence trail</h3>
+                  <ul className="evidence-list">
+                    {(result?.report?.evidence || investigationContext?.evidence || []).map((item, index) => (
+                      <li key={`${item.entityType}-${item.entityName}-${index}`} className="evidence-item">
+                        <div>
+                          <strong>{item.entityName}</strong>
+                          <span>{item.entityType}</span>
+                        </div>
+                        <div className="evidence-meta">
+                          <span>{item.provenance?.source || 'report'}</span>
+                          <span>{Math.round((item.confidence || 0.7) * 100)}%</span>
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              {(result?.report?.events?.length > 0 || investigationContext?.events?.length > 0) && (
+                <div className="result-section">
+                  <h3>Event timeline</h3>
+                  <ul className="event-list">
+                    {(result?.report?.events || investigationContext?.events || []).map((event, index) => (
+                      <li key={`${event.type}-${event.source}-${index}`} className="event-item">
+                        <span className="badge badge-accent">{event.type}</span>
+                        <p>{event.description || `${event.source} → ${event.target}`}</p>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              {(result?.report?.leads?.length > 0 || investigationContext?.leads?.length > 0) && (
+                <div className="result-section">
+                  <h3>Recommended leads</h3>
+                  <ul className="lead-list">
+                    {(result?.report?.leads || investigationContext?.leads || []).map((lead, index) => (
+                      <li key={`${lead.title}-${index}`} className="lead-item">
+                        <div className="lead-header">
+                          <strong>{lead.title}</strong>
+                          <span>{Math.round((lead.riskScore || 0.7) * 100)}% risk</span>
+                        </div>
+                        {lead.reasons?.length > 0 && (
+                          <div className="flag-tags small-gap">
+                            {lead.reasons.map((reason, reasonIndex) => (
+                              <span key={`${reason}-${reasonIndex}`} className="tag tag-risk">
+                                {reason}
+                              </span>
+                            ))}
+                          </div>
+                        )}
+                        {lead.nextAction && <p>{lead.nextAction}</p>}
+                      </li>
+                    ))}
+                  </ul>
                 </div>
               )}
 

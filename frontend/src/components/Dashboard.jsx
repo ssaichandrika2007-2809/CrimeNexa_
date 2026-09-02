@@ -74,6 +74,10 @@ export default function Dashboard() {
 
   const topInfluencers = people.slice(0, 5);
   const flaggedReports = reports.filter((r) => r.riskFlags && r.riskFlags.length > 0).slice(0, 5);
+  const leadCandidates = reports
+    .flatMap((report) => (report.leads || []).map((lead) => ({ ...lead, sourceType: report.sourceType, reportId: report.id })))
+    .sort((a, b) => (b.riskScore || 0) - (a.riskScore || 0))
+    .slice(0, 5);
   const mapUrl = `https://www.openstreetmap.org/export/embed.html?bbox=${(geoState.lon - 0.04).toFixed(5)}%2C${(geoState.lat - 0.04).toFixed(5)}%2C${(geoState.lon + 0.04).toFixed(5)}%2C${(geoState.lat + 0.04).toFixed(5)}&layer=mapnik&marker=${geoState.lat}%2C${geoState.lon}`;
 
   if (loading) return <div className="page-loading">Loading command center…</div>;
@@ -150,8 +154,67 @@ export default function Dashboard() {
                       </span>
                     ))}
                   </div>
+                  {typeof r.confidence === 'number' && (
+                    <div className="confidence-inline">
+                      <span>Confidence</span>
+                      <strong>{Math.round(r.confidence * 100)}%</strong>
+                    </div>
+                  )}
                 </li>
               ))}
+            </ul>
+          )}
+        </section>
+      </div>
+
+      <div className="panel-grid panel-grid-secondary">
+        <section className="panel">
+          <h2>Investigation Leads</h2>
+          {leadCandidates.length === 0 ? (
+            <p className="empty-state">No lead candidates identified yet.</p>
+          ) : (
+            <ul className="lead-list compact">
+              {leadCandidates.map((lead, index) => (
+                <li key={`${lead.title}-${index}`} className="lead-item compact-lead">
+                  <div className="lead-header">
+                    <strong>{lead.title}</strong>
+                    <span>{Math.round((lead.riskScore || 0.7) * 100)}% risk</span>
+                  </div>
+                  <div className="flag-tags small-gap">
+                    {(lead.reasons || []).map((reason, reasonIndex) => (
+                      <span key={`${reason}-${reasonIndex}`} className="tag tag-risk">
+                        {reason}
+                      </span>
+                    ))}
+                  </div>
+                  {lead.nextAction && <p>{lead.nextAction}</p>}
+                </li>
+              ))}
+            </ul>
+          )}
+        </section>
+
+        <section className="panel">
+          <h2>Evidence Snapshot</h2>
+          {reports.filter((report) => report.evidence && report.evidence.length > 0).length === 0 ? (
+            <p className="empty-state">No evidence items have been recorded yet.</p>
+          ) : (
+            <ul className="evidence-list compact-evidence">
+              {reports
+                .flatMap((report) => (report.evidence || []).map((item) => ({ ...item, sourceType: report.sourceType })))
+                .slice(0, 6)
+                .map((item, index) => (
+                  <li key={`${item.entityType}-${item.entityName}-${index}`} className="evidence-item">
+                    <div>
+                      <strong>{item.entityName}</strong>
+                      <span>{item.entityType}</span>
+                    </div>
+                    <div className="evidence-meta">
+                      <span>{item.sourceType}</span>
+                      <span>{Math.round((item.confidence || 0.7) * 100)}%</span>
+                    </div>
+                  </li>
+                ))}
             </ul>
           )}
         </section>
