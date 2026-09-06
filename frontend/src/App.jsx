@@ -13,17 +13,27 @@ import ProfilePage from './components/ProfilePage';
 import './App.css';
 
 const AUTH_KEY = 'crimegraph-user';
+const THEME_KEY = 'crimenexa-theme';
 const demoAccounts = {
-  investigator: { username: 'investigator@crimegraph.in', password: 'investigator123', label: 'Investigator' },
-  admin: { username: 'admin@crimegraph.in', password: 'admin123', label: 'Administrator' }
+  investigator: { username: 'investigator@crimenexa.in', password: 'investigator123', label: 'Investigator' },
+  admin: { username: 'admin@crimenexa.in', password: 'admin123', label: 'Administrator' }
 };
 
 const AuthContext = createContext(null);
+const ThemeContext = createContext(null);
 
 export function useAuth() {
   const context = useContext(AuthContext);
   if (!context) {
     throw new Error('Auth context is not available');
+  }
+  return context;
+}
+
+export function useTheme() {
+  const context = useContext(ThemeContext);
+  if (!context) {
+    throw new Error('Theme context is not available');
   }
   return context;
 }
@@ -51,6 +61,13 @@ export default function App() {
       return null;
     }
   });
+  const [theme, setTheme] = useState(() => {
+    try {
+      return localStorage.getItem(THEME_KEY) || 'light';
+    } catch {
+      return 'light';
+    }
+  });
 
   useEffect(() => {
     if (user) {
@@ -59,6 +76,14 @@ export default function App() {
       localStorage.removeItem(AUTH_KEY);
     }
   }, [user]);
+
+  useEffect(() => {
+    document.documentElement.dataset.theme = theme;
+    try {
+      localStorage.setItem(THEME_KEY, theme);
+    } catch {
+    }
+  }, [theme]);
 
   const value = useMemo(
     () => ({
@@ -90,7 +115,8 @@ export default function App() {
   );
 
   return (
-    <AuthContext.Provider value={value}>
+    <ThemeContext.Provider value={{ theme, toggleTheme: () => setTheme((current) => current === 'light' ? 'dark' : 'light') }}>
+      <AuthContext.Provider value={value}>
       <Routes>
         <Route path="/" element={<Hero />} />
         <Route
@@ -174,6 +200,7 @@ export default function App() {
           }
         />
       </Routes>
-    </AuthContext.Provider>
+      </AuthContext.Provider>
+    </ThemeContext.Provider>
   );
 }

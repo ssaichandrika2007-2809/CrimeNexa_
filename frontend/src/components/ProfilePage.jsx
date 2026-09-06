@@ -93,7 +93,7 @@ export default function ProfilePage() {
             </div>
             <div className="profile-info-row">
               <span>Email</span>
-              <strong>{user?.username || 'investigator@crimegraph.in'}</strong>
+              <strong>{user?.username || 'investigator@crimenexa.in'}</strong>
             </div>
             <div className="profile-info-row">
               <span>Account status</span>

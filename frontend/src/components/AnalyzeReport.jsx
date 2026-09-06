@@ -44,6 +44,11 @@ export default function AnalyzeReport() {
   const extracted = result?.extracted;
   const investigationContext = result?.investigationContext || result?.report || null;
   const confidence = result?.report?.confidence ?? investigationContext?.confidence ?? null;
+  const womenSafetySignals =
+    result?.report?.womenSafetySignals ??
+    result?.womenSafetySignals ??
+    investigationContext?.womenSafetySignals ??
+    [];
 
   return (
     <div className="page">
@@ -170,6 +175,39 @@ export default function AnalyzeReport() {
                   </ul>
                 </div>
               )}
+
+              <div className="result-section">
+                <h3>Women Safety Intelligence</h3>
+                {womenSafetySignals.length > 0 ? (
+                  <ul className="lead-list">
+                    {womenSafetySignals.map((signal, index) => (
+                      <li key={`${signal.type}-${index}`} className="lead-item women-safety-item">
+                        <div className="lead-header">
+                          <strong>{signal.title}</strong>
+                          <span>{signal.severity || 'medium'} / {Math.round((signal.confidence || 0.6) * 100)}%</span>
+                        </div>
+                        <p>{signal.description}</p>
+                        {signal.relatedEntities?.length > 0 && (
+                          <div className="flag-tags small-gap">
+                            {signal.relatedEntities.slice(0, 4).map((entity, entityIndex) => (
+                              <span key={`${entity}-${entityIndex}`} className="tag tag-risk">
+                                {entity}
+                              </span>
+                            ))}
+                          </div>
+                        )}
+                        {signal.evidenceRefs?.length > 0 && (
+                          <p className="women-safety-meta">
+                            {signal.evidenceRefs.length} evidence references · {signal.requiresHumanReview ? 'Human review recommended' : 'No review required'}
+                          </p>
+                        )}
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p className="empty-state">No women-safety pattern detected from the current evidence set.</p>
+                )}
+              </div>
 
               {(result?.report?.leads?.length > 0 || investigationContext?.leads?.length > 0) && (
                 <div className="result-section">

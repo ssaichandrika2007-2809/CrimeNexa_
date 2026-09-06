@@ -3,7 +3,6 @@ import { fetchGraph, fetchPeople, fetchCases, fetchReports } from '../api';
 
 export default function Dashboard() {
   const [graph, setGraph] = useState({ nodes: [], edges: [] });
-  const [people, setPeople] = useState([]);
   const [cases, setCases] = useState([]);
   const [reports, setReports] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -19,9 +18,8 @@ export default function Dashboard() {
 
   useEffect(() => {
     Promise.all([fetchGraph(), fetchPeople(), fetchCases(), fetchReports()])
-      .then(([g, p, c, r]) => {
+      .then(([g, , c, r]) => {
         setGraph(g);
-        setPeople(p);
         setCases(c);
         setReports(r);
       })
@@ -69,10 +67,12 @@ export default function Dashboard() {
     locations: graph.nodes.filter((n) => n.group === 'location').length,
     organizations: graph.nodes.filter((n) => n.group === 'organization').length,
     relationships: graph.edges.length,
-    cases: cases.length
+    cases: cases.length,
+    evidence: reports.reduce((total, report) => total + (report.evidence?.length || 0), 0),
+    keyEntities: graph.keyEntities?.length || 0
   };
 
-  const topInfluencers = people.slice(0, 5);
+  const topInfluencers = (graph.keyEntities || []).filter((entity) => entity.entityType === 'person').slice(0, 5);
   const flaggedReports = reports.filter((r) => r.riskFlags && r.riskFlags.length > 0).slice(0, 5);
   const leadCandidates = reports
     .flatMap((report) => (report.leads || []).map((lead) => ({ ...lead, sourceType: report.sourceType, reportId: report.id })))
@@ -87,29 +87,29 @@ export default function Dashboard() {
     <div className="page">
       <div className="page-header">
         <h1>Command Center</h1>
-        <p className="page-subtitle">A live snapshot of everything CrimeGraph has extracted so far.</p>
+        <p className="page-subtitle">A live snapshot of everything CrimeNexa has extracted so far.</p>
       </div>
 
       <div className="stat-grid">
         <div className="stat-card">
-          <span className="stat-value">{counts.people}</span>
-          <span className="stat-label">People</span>
+          <span className="stat-value">{counts.cases}</span>
+          <span className="stat-label">Cases</span>
         </div>
         <div className="stat-card">
-          <span className="stat-value">{counts.locations}</span>
-          <span className="stat-label">Locations</span>
-        </div>
-        <div className="stat-card">
-          <span className="stat-value">{counts.organizations}</span>
-          <span className="stat-label">Organizations</span>
+          <span className="stat-value">{graph.nodes.length}</span>
+          <span className="stat-label">Entities</span>
         </div>
         <div className="stat-card">
           <span className="stat-value">{counts.relationships}</span>
           <span className="stat-label">Relationships</span>
         </div>
         <div className="stat-card">
-          <span className="stat-value">{counts.cases}</span>
-          <span className="stat-label">Cases</span>
+          <span className="stat-value">{counts.evidence}</span>
+          <span className="stat-label">Evidence sources</span>
+        </div>
+        <div className="stat-card">
+          <span className="stat-value">{counts.keyEntities}</span>
+          <span className="stat-label">Key entities</span>
         </div>
       </div>
 
@@ -121,13 +121,13 @@ export default function Dashboard() {
           ) : (
             <ul className="ranked-list">
               {topInfluencers.map((p, i) => (
-                <li key={p.id} className="ranked-item">
-                  <span className="ranked-index">{i + 1}</span>
+                <li key={p.entityId} className="ranked-item">
+                  <span className="ranked-index">#{p.rank || i + 1}</span>
                   <div className="ranked-body">
                     <span className="ranked-name">{p.name}</span>
-                    <span className="ranked-meta">{p.role || 'role unknown'}</span>
+                    <span className="ranked-meta">{p.entityType} · Score {p.keyEntityScore}</span>
                   </div>
-                  <span className="badge badge-accent">{p.connectionCount} links</span>
+                  <span className="badge badge-accent">{p.metrics.connections} links</span>
                 </li>
               ))}
             </ul>
@@ -249,7 +249,7 @@ export default function Dashboard() {
         </div>
 
         <iframe
-          title="CrimeGraph location map"
+          title="CrimeNexa location map"
           className="geo-map"
           src={mapUrl}
           loading="lazy"
