@@ -1,4 +1,4 @@
-# CrimeGraph — AI-Powered Criminal Network Analysis (MVP)
+# CrimeNexa — AI-Powered Criminal Network Analysis (MVP)
 
 Prototype built for **Smart India Hackathon 2026**, under the Ministry of Home Affairs / NCRB —
 Women Safety Division problem statement on AI-powered criminal network analysis.
