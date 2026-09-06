@@ -28,6 +28,18 @@ export default function AdminPage() {
         <span className="role-badge">National desk</span>
       </div>
 
+      <div className="role-spotlight accent">
+        <div>
+          <span className="section-label">System overview</span>
+          <h2>Cross-unit intelligence is stable, with alerts rising in priority.</h2>
+        </div>
+        <div className="quick-actions">
+          <span className="action-pill">Network health</span>
+          <span className="action-pill">Source sync</span>
+          <span className="action-pill">Threat checks</span>
+        </div>
+      </div>
+
       <div className="role-grid">
         {stats.map((item) => (
           <div className="role-card" key={item.label}>
@@ -38,7 +50,10 @@ export default function AdminPage() {
       </div>
 
       <div className="role-panel">
-        <h3>Live operational alerts</h3>
+        <div className="panel-heading-row">
+          <h3>Live operational alerts</h3>
+          <span className="mini-badge danger">Updated</span>
+        </div>
         <ul className="list-plain">
           {alerts.map((alert) => (
             <li key={alert.name}>

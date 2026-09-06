@@ -3,6 +3,7 @@ const { v4: uuidv4 } = require('uuid');
 const { readDB, writeDB } = require('../db');
 const { extractEntities } = require('../services/nlpService');
 const { buildInvestigationContext } = require('../services/investigationModel');
+const { analyzeWomenSafetySignals } = require('../services/womenSafetyAnalysis');
 const {
   syncEntitiesToGraph,
   syncRelationshipsToGraph
@@ -50,6 +51,15 @@ router.post('/', async (req, res, next) => {
       entities: extracted.entities || {},
       relationships: extracted.relationships || [],
       riskFlags: extracted.riskFlags || []
+    });
+
+    const womenSafetySignals = analyzeWomenSafetySignals({
+      text,
+      entities: extracted.entities || {},
+      relationships: extracted.relationships || [],
+      events: investigationContext.events || [],
+      evidence: investigationContext.evidence || [],
+      caseId: caseId || null
     });
 
     const db = readDB();
@@ -106,6 +116,7 @@ router.post('/', async (req, res, next) => {
       confidence: investigationContext.confidence || 0.75,
       events: investigationContext.events || [],
       leads: investigationContext.leads || [],
+      womenSafetySignals,
       provenance: investigationContext.provenance || { sourceType: sourceType || 'unspecified' },
       caseId: caseId || null,
       createdAt: new Date().toISOString()
@@ -124,7 +135,7 @@ router.post('/', async (req, res, next) => {
     db.leads = [...(db.leads || []), ...reportRecord.leads];
     writeDB(db);
 
-    res.json({ report: reportRecord, extracted, investigationContext });
+    res.json({ report: reportRecord, extracted, investigationContext, womenSafetySignals });
   } catch (err) {
     next(err);
   }

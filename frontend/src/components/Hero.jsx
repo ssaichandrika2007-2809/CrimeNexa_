@@ -6,7 +6,7 @@ export default function Hero() {
   const navigate = useNavigate();
   const { user, login, logout, demoAccounts } = useAuth();
   const [role, setRole] = useState('investigator');
-  const [username, setUsername] = useState('investigator@crimegraph.in');
+  const [username, setUsername] = useState('investigator@crimenexa.in');
   const [password, setPassword] = useState('investigator123');
   const [error, setError] = useState('');
 
@@ -60,17 +60,24 @@ export default function Hero() {
     <div className="hero">
       <div className="hero-grid" aria-hidden="true" />
       <div className="hero-content">
-        <span className="hero-eyebrow">CrimeGraph · Intelligence Platform</span>
+        <div className="hero-brand-row">
+          <span className="hero-eyebrow">CrimeNexa · Intelligence Platform</span>
+        </div>
+
         <h1 className="hero-title">
-          Crime<span className="hero-title-accent">Graph</span>
+          Crime<span className="hero-title-accent">Nexa</span>
         </h1>
         <p className="hero-subtitle">
-          Investigative intelligence for case review and network analysis. CrimeGraph consolidates FIRs,
+          Investigative intelligence for case review and network analysis. CrimeNexa consolidates FIRs,
           call records, financial details, and surveillance notes to surface people, locations, and
           relationships that matter most in an inquiry.
         </p>
 
         <div className="hero-login-panel">
+          <div className="panel-tag-row">
+            <span className="panel-tag">Secure access</span>
+            <span className="panel-tag subtle">Demo mode</span>
+          </div>
           <h2>Secure sign in</h2>
           <form className="hero-login-form" onSubmit={handleSubmit}>
             <div className="hero-form-row">

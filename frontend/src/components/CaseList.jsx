@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { fetchCases, createCase } from '../api';
+import { fetchCases, fetchGraph, createCase } from '../api';
 
 export default function CaseList() {
   const [cases, setCases] = useState([]);
@@ -8,11 +8,12 @@ export default function CaseList() {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [creating, setCreating] = useState(false);
+  const [graph, setGraph] = useState({ edges: [] });
 
   function load() {
     setLoading(true);
-    fetchCases()
-      .then(setCases)
+    Promise.all([fetchCases(), fetchGraph()])
+      .then(([caseData, graphData]) => { setCases(caseData); setGraph(graphData); })
       .catch(() => setError('Could not reach the backend. Is it running?'))
       .finally(() => setLoading(false));
   }
@@ -86,6 +87,7 @@ export default function CaseList() {
                   <span className="badge badge-source">{(c.reports || []).length} reports</span>
                 </div>
                 {c.description && <p className="case-item-description">{c.description}</p>}
+                <div className="case-item-metrics"><span>{graph.edges.filter((edge) => edge.caseId === c.id).length || '—'} relationships</span><span>{c.status || 'Open'}</span></div>
                 <span className="case-item-date">
                   Opened {new Date(c.createdAt).toLocaleDateString()}
                 </span>
